@@ -26,20 +26,25 @@ public:
 // Overrides
 public:
 	virtual BOOL InitInstance();
+
 	virtual int ExitInstance();
 
 // Implementation
 
 public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 	virtual void PreLoadState();
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
 	BOOL SetupMainWindow();
 	void InitTooltips();
 	void InitControls();
+	BOOL InitCef();
 
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+
+
 };
 
 extern CMainApp theApp;

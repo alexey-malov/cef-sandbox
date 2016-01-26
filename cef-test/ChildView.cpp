@@ -1,20 +1,9 @@
-// This MFC Samples source code demonstrates using MFC Microsoft Office Fluent User Interface 
-// (the "Fluent UI") and is provided only as referential material to supplement the 
-// Microsoft Foundation Classes Reference and related electronic documentation 
-// included with the MFC C++ library software.  
-// License terms to copy, use or distribute the Fluent UI are available separately.  
-// To learn more about our Fluent UI licensing program, please visit 
-// http://go.microsoft.com/fwlink/?LinkId=238214.
-//
-// Copyright (C) Microsoft Corporation
-// All rights reserved.
-
-// ChildView.cpp : implementation of the CChildView class
-//
-
 #include "stdafx.h"
 #include "MainApp.h"
 #include "ChildView.h"
+#include "ClientHandler.h"
+#include "CefUtils.h"
+#include <boost\filesystem\path.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -34,6 +23,11 @@ CChildView::~CChildView()
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
+	ON_WM_CREATE()
+	ON_WM_SIZE()
+	ON_WM_DESTROY()
+	ON_COMMAND(ID_CHANGE_COLOR, &CChildView::OnChangeColor)
+	ON_UPDATE_COMMAND_UI(ID_CHANGE_COLOR, &CChildView::OnUpdateChangeColor)
 END_MESSAGE_MAP()
 
 
@@ -61,4 +55,99 @@ void CChildView::OnPaint()
 	
 	// Do not call CWnd::OnPaint() for painting messages
 }
+
+int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	m_client = MakeCefRefPtr<CClientHandler>();
+	m_onCreateConnection = m_client->DoOnBrowserCreated([=](const CefRefPtr<CefBrowser> & browser){
+		m_browser = browser;
+		auto size = GetClientSize();
+		SetBrowserWindowSize(size.cx, size.cy);
+	});
+
+	m_client->GetMessageRouter()->AddHandler(this, false);
+
+	CefWindowInfo winInfo;
+	CRect rc;
+	GetClientRect(rc);
+	winInfo.SetAsChild(m_hWnd, rc);
+	CefBrowserSettings settings;
+	//boost::filesystem::current_path()
+	WCHAR buf[MAX_PATH];
+	GetModuleFileNameW(NULL, buf, MAX_PATH);
+	
+	CefBrowserHost::CreateBrowser(winInfo, m_client, (boost::filesystem::path(buf).parent_path() / "index.html").c_str(), settings, nullptr);
+
+	return 0;
+}
+
+void CChildView::OnSize(UINT nType, int cx, int cy)
+{
+	CWnd::OnSize(nType, cx, cy);
+
+	SetBrowserWindowSize(cx, cy);
+}
+
+CSize CChildView::GetClientSize() const
+{
+	CRect rc;
+	GetClientRect(rc);
+	return {rc.Width(), rc.Height()};
+}
+
+void CChildView::SetBrowserWindowSize(int width, int height)
+{
+	if (m_browser)
+	{
+		::SetWindowPos(m_browser->GetHost()->GetWindowHandle(), nullptr, 0, 0, width, height, SWP_NOZORDER);
+	}
+}
+
+void CChildView::OnDestroy()
+{
+	CWnd::OnDestroy();
+
+	m_client->GetMessageRouter()->RemoveHandler(this);
+	m_onCreateConnection.disconnect();
+	m_browser = nullptr;
+	m_client = nullptr;
+}
+
+void CChildView::OnChangeColor()
+{
+	m_browser->GetMainFrame()->ExecuteJavaScript("changeColor('green');", "index.html", 0);
+}
+
+void CChildView::OnUpdateChangeColor(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable(m_colorButtonEnabled);
+}
+
+
+#pragma region CefMessageRouterBrowserSide::Handler methods
+bool CChildView::OnQuery(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, int64 /*query_id*/, const CefString& request, bool /*persistent*/, CefRefPtr<Callback> callback)
+{
+	if (request == "enableButton")
+	{
+		m_colorButtonEnabled = true;
+		callback->Success("OK");
+		return true;
+	}
+	else if (request == "disableButton")
+	{
+		m_colorButtonEnabled = false;
+		callback->Success("OK");
+		return true;
+	}
+	return false;
+}
+
+void CChildView::OnQueryCanceled(CefRefPtr<CefBrowser> /*browser*/, CefRefPtr<CefFrame> /*frame*/, int64 /*query_id*/)
+{
+}
+#pragma endregion CefMessageRouterBrowserSide::Handler methods
+
 

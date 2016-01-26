@@ -12,7 +12,7 @@ public:
 		Other,
 	};
 
-	CBaseApp(const CefRefPtr<CefBrowserProcessHandler> & browserProcessHandler, const CefRefPtr<CefRenderProcessHandler> & renderProcessHandler);
+	CBaseApp(const CefRefPtr<CefBrowserProcessHandler> & browserProcessHandler = nullptr, const CefRefPtr<CefRenderProcessHandler> & renderProcessHandler = nullptr);
 
 	static ProcessType GetProcessType(const CefRefPtr<CefCommandLine> & cmdLine);
 

@@ -114,3 +114,9 @@ void SimpleHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 {
 	//frame->ExecuteJavaScript("alert('Frame loading has ended');", frame->GetURL(), 0);
 }
+
+bool SimpleHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message)
+{
+	MessageBoxW(NULL, message->GetName().c_str(), L"", MB_OK);
+	return true;
+}

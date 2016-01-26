@@ -42,12 +42,20 @@
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
+#pragma warning (push, 3)
+#pragma warning (disable: 4996 4702)
+#include <boost/signals2.hpp>
+#pragma warning(pop)
 
+#pragma warning (disable:4503)
 
 // Cef headers
 #pragma warning(push, 3)
 #include "include\cef_app.h"
 #include "include\cef_command_line.h"
+#include "include\cef_browser.h"
+#include "include\cef_client.h"
+#include "include\wrapper\cef_message_router.h"
 #pragma warning(pop)
 
 

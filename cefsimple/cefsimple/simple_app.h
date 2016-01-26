@@ -9,10 +9,15 @@
 
 class MyV8Handler : public CefV8Handler
 {
-
+public:
+	CefRefPtr<CefV8Context> m_context;
 private:
 	// Provide the reference counting implementation for this class.
 	IMPLEMENT_REFCOUNTING(MyV8Handler);
+	~MyV8Handler()
+	{
+
+	}
 
 	virtual bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) override
 	{
@@ -62,6 +67,15 @@ public:
 		auto global = context->GetGlobal();
 		auto fn = CefV8Value::CreateFunction("my42", new MyV8Handler);
 		global->SetValue("my42", fn, V8_PROPERTY_ATTRIBUTE_READONLY);
+
+		browser->SendProcessMessage(PID_BROWSER, CefProcessMessage::Create(L"hello"));
+	}
+
+	virtual void OnContextReleased(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		CefRefPtr<CefV8Context> context)
+	{
+
 	}
 
 		// CefBrowserProcessHandler methods:

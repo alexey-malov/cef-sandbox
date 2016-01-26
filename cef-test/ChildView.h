@@ -15,10 +15,14 @@
 
 #pragma once
 
+#include "Signals.h"
 
 // CChildView window
+class CClientHandler;
 
-class CChildView : public CWnd
+class CChildView 
+	: public CWnd
+	, CefMessageRouterBrowserSide::Handler
 {
 // Construction
 public:
@@ -31,16 +35,40 @@ public:
 public:
 
 // Overrides
-	protected:
+protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
 // Implementation
 public:
 	virtual ~CChildView();
 
+private:
+#pragma region CefMessageRouterBrowserSide::Handler methods
+	virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id, const CefString& request, bool persistent, CefRefPtr<Callback> callback) override;
+	virtual void OnQueryCanceled(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id) override;
+#pragma endregion CefMessageRouterBrowserSide::Handler methods
+
 	// Generated message map functions
-protected:
 	afx_msg void OnPaint();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	
+	CefRefPtr<CefBrowser> m_browser;
+	CefRefPtr<CClientHandler> m_client;
+
+private:
 	DECLARE_MESSAGE_MAP()
+	CSize GetClientSize()const;
+	void SetBrowserWindowSize(int width, int height);
+
+	afx_msg void OnDestroy();
+	afx_msg void OnChangeColor();
+
+
+	signals::scoped_connection m_onCreateConnection;
+
+	bool m_colorButtonEnabled = true;
+public:
+	afx_msg void OnUpdateChangeColor(CCmdUI *pCmdUI);
 };
 

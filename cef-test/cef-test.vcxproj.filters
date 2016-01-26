@@ -21,11 +21,17 @@
     <Filter Include="Support Files">
       <UniqueIdentifier>{0d9a6388-b84a-4edc-ab9a-088a184dc573}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\App\Handlers">
-      <UniqueIdentifier>{3f878160-5dea-4d87-b12f-ba0f1b079bff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{877402c2-59ee-4f4a-bc8c-a5aa4d3a35a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\App\Browser">
+      <UniqueIdentifier>{7ca97b9e-33cc-43fd-8d02-d2b0574fb3a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\App\Common">
+      <UniqueIdentifier>{140600fb-7fdd-44d2-89b4-6f8adaa169ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\App\Renderer">
+      <UniqueIdentifier>{0decf877-2a41-4ebe-8216-6afd38bdc737}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -53,17 +59,32 @@
     <ClInclude Include="CefUtils.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="BaseApp.h">
+    <ClInclude Include="SingleProcessApp.h">
       <Filter>Source Files\App</Filter>
     </ClInclude>
     <ClInclude Include="BrowserProcessApp.h">
-      <Filter>Source Files\App</Filter>
+      <Filter>Source Files\App\Browser</Filter>
     </ClInclude>
-    <ClInclude Include="BrowserProcessHandler.h">
-      <Filter>Source Files\App\Handlers</Filter>
+    <ClInclude Include="BaseApp.h">
+      <Filter>Source Files\App\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderProcessApp.h">
+      <Filter>Source Files\App\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="RenderProcessHandler.h">
-      <Filter>Source Files\App\Handlers</Filter>
+      <Filter>Source Files\App\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserProcessHandler.h">
+      <Filter>Source Files\App\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientHandler.h">
+      <Filter>Source Files\App\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="Signals.h">
+      <Filter>Source Files\App\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageRouterQueryHandler.h">
+      <Filter>Source Files\App\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -79,17 +100,29 @@
     <ClCompile Include="MainApp.cpp">
       <Filter>Source Files\App</Filter>
     </ClCompile>
-    <ClCompile Include="BaseApp.cpp">
+    <ClCompile Include="SingleProcessApp.cpp">
       <Filter>Source Files\App</Filter>
     </ClCompile>
     <ClCompile Include="BrowserProcessApp.cpp">
-      <Filter>Source Files\App</Filter>
+      <Filter>Source Files\App\Browser</Filter>
     </ClCompile>
-    <ClCompile Include="BrowserProcessHandler.cpp">
-      <Filter>Source Files\App\Handlers</Filter>
+    <ClCompile Include="BaseApp.cpp">
+      <Filter>Source Files\App\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderProcessApp.cpp">
+      <Filter>Source Files\App\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="RenderProcessHandler.cpp">
-      <Filter>Source Files\App\Handlers</Filter>
+      <Filter>Source Files\App\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserProcessHandler.cpp">
+      <Filter>Source Files\App\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientHandler.cpp">
+      <Filter>Source Files\App\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageRouterQueryHandler.cpp">
+      <Filter>Source Files\App\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

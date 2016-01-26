@@ -50,6 +50,17 @@ class SimpleHandler : public CefClient,
                          CefRefPtr<CefFrame> frame, 
                          int httpStatusCode) override;
 
+  ///
+  // Called when a new message is received from a different process. Return true
+  // if the message was handled or false otherwise. Do not keep a reference to
+  // or attempt to access the message outside of this callback.
+  ///
+  /*--cef()--*/
+  virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+	  CefProcessId source_process,
+	  CefRefPtr<CefProcessMessage> message) override;
+
+
   // Request that all existing browser windows close.
   void CloseAllBrowsers(bool force_close);
 

@@ -1,0 +1,47 @@
+<html>
+<body>
+    <span id="label" style="color: red">Hello</span>
+    <input type="button" value="Enable" onclick="onEnable()"/>
+    <input type="button" value="Disable" onclick="onDisable()"/>
+    <div id="logger"></div>
+<script>
+
+    function logString(str)
+    {
+        var logger = document.getElementById("logger");
+        logger.innerHTML += "<p>" + str + "</p>";
+    }
+
+    function executeQuery(request)
+    {
+        window.cefQuery({
+            request: request,
+            persistent: false,
+            onSuccess: function (response) {
+                logString("Response: " + response + " " + new Date().getMilliseconds().toString());
+            },
+            onFailure: function (errorCode, errorMessage) {
+                logString("Response: " + errorCode + " " + errorMessage + " " + new Date().getMilliseconds().toString());
+            }
+        });
+        logString("Request: " + request + " " + new Date().getMilliseconds().toString());
+    }
+
+    function onDisable()
+    {
+        executeQuery("disableButton");
+    }
+
+    function onEnable()
+    {
+        executeQuery("enableButton");
+    }
+
+    function changeColor(color)
+    {
+        var label = document.getElementById("label");
+        label.style.color = color;
+    }
+</script>
+</body>
+</html>

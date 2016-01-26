@@ -18,9 +18,10 @@
 #include "MainApp.h"
 #include "MainFrm.h"
 #include "BaseApp.h"
-#include "BrowserProcessHandler.h"
-#include "RenderProcessHandler.h"
 #include "CefUtils.h"
+#include "SingleProcessApp.h"
+#include "BrowserProcessApp.h"
+#include "RenderProcessApp.h"
 
 
 #ifdef _DEBUG
@@ -51,34 +52,14 @@ CMainApp theApp;
 
 BOOL CMainApp::InitInstance()
 {
-	auto cmdLine = CefCommandLine::CreateCommandLine();
-	cmdLine->InitFromString(::GetCommandLineW());
-	auto processType = CBaseApp::GetProcessType(cmdLine);
-
-	CefRefPtr<CefBrowserProcessHandler> browserProcessHandler;
-	CefRefPtr<CefRenderProcessHandler> renderProcessHandler;
-	switch (processType)
+	if (!InitCef())
 	{
-	case CBaseApp::ProcessType::SingleProcess:
-		browserProcessHandler = MakeCefRefPtr<CBrowserProcessHandler>();
-		renderProcessHandler = MakeCefRefPtr<CRenderProcessHandler>();
-		break;
-	case CBaseApp::ProcessType::Browser:
-		browserProcessHandler = MakeCefRefPtr<CBrowserProcessHandler>();
-		break;
-	case CBaseApp::ProcessType::Renderer:
-		renderProcessHandler = MakeCefRefPtr<CRenderProcessHandler>();
-		break;
-	case CBaseApp::ProcessType::Other:
-		break;
-	default:
-		break;
+		return FALSE;
 	}
 
 	InitControls();
 
 	CWinAppEx::InitInstance();
-
 
 	// Initialize OLE libraries
 	if (!AfxOleInit())
@@ -106,6 +87,59 @@ BOOL CMainApp::InitInstance()
 	InitTooltips();
 
 	return SetupMainWindow();
+}
+
+BOOL CMainApp::InitCef()
+{
+	CefEnableHighDPISupport();
+	void* sandboxInfo = NULL;
+#if defined(CEF_USE_SANDBOX)
+	// Manage the life span of the sandbox information object. This is necessary
+	// for sandbox support on Windows. See cef_sandbox_win.h for complete details.
+	CefScopedSandboxInfo scopedSandbox;
+	sandboxInfo = scopedSandbox.sandbox_info();
+#endif
+
+	auto cmdLine = CefCommandLine::CreateCommandLine();
+	cmdLine->InitFromString(::GetCommandLineW());
+	auto processType = CBaseApp::GetProcessType(cmdLine);
+
+	CefRefPtr<CBaseApp> app;
+	switch (processType)
+	{
+	case CBaseApp::ProcessType::SingleProcess:
+		app = MakeCefRefPtr<CSingleProcessApp>();
+		break;
+	case CBaseApp::ProcessType::Browser:
+		app = MakeCefRefPtr<CBrowserProcessApp>();
+		break;
+	case CBaseApp::ProcessType::Renderer:
+		app = MakeCefRefPtr<CRenderProcessApp>();
+		break;
+	case CBaseApp::ProcessType::Other:
+		app = MakeCefRefPtr<CBaseApp>();
+		break;
+	default:
+		return -1;
+	}
+
+	// Provide CEF with command-line arguments.
+	CefMainArgs mainArgs(m_hInstance);
+	if (CefExecuteProcess(mainArgs, app, sandboxInfo) >= 0)
+	{
+		return FALSE;
+	}
+
+	// Specify CEF global settings here.
+	CefSettings settings;
+
+#if !defined(CEF_USE_SANDBOX)
+	settings.no_sandbox = true;
+#endif
+
+	CefInitialize(mainArgs, settings, app, sandboxInfo);
+
+	return TRUE;
 }
 
 BOOL CMainApp::SetupMainWindow()
@@ -151,6 +185,8 @@ void CMainApp::InitControls()
 
 int CMainApp::ExitInstance()
 {
+	CefShutdown();
+
 	//TODO: handle additional resources you may have added
 	AfxOleTerm(FALSE);
 
@@ -195,6 +231,12 @@ void CMainApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
+}
+
+BOOL CMainApp::PreTranslateMessage(MSG* pMsg)
+{
+	CefDoMessageLoopWork();
+	return CWinAppEx::PreTranslateMessage(pMsg);
 }
 
 // CBrowserApp customization load/save methods
