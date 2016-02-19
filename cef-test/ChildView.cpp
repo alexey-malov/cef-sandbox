@@ -61,25 +61,22 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	m_client = MakeCefRefPtr<CClientHandler>();
-	m_onCreateConnection = m_client->DoOnBrowserCreated([=](const CefRefPtr<CefBrowser> & browser){
-		m_browser = browser;
-		auto size = GetClientSize();
-		SetBrowserWindowSize(size.cx, size.cy);
-	});
 
+	m_client = MakeCefRefPtr<CClientHandler>();
 	m_client->GetMessageRouter()->AddHandler(this, false);
 
 	CefWindowInfo winInfo;
 	CRect rc;
 	GetClientRect(rc);
 	winInfo.SetAsChild(m_hWnd, rc);
-	CefBrowserSettings settings;
-	//boost::filesystem::current_path()
+
 	WCHAR buf[MAX_PATH];
 	GetModuleFileNameW(NULL, buf, MAX_PATH);
+	//CefString url((boost::filesystem::path(buf).parent_path() / "index.html").native());
+	CefString url(LR"(\\glitcher\wwwroot\ilyas\!keyboard\index.html)");
 	
-	CefBrowserHost::CreateBrowser(winInfo, m_client, (boost::filesystem::path(buf).parent_path() / "index.html").c_str(), settings, nullptr);
+	
+	m_browser = CefBrowserHost::CreateBrowserSync(winInfo, m_client, url, CefBrowserSettings(), nullptr);
 
 	return 0;
 }
@@ -111,7 +108,6 @@ void CChildView::OnDestroy()
 	CWnd::OnDestroy();
 
 	m_client->GetMessageRouter()->RemoveHandler(this);
-	m_onCreateConnection.disconnect();
 	m_browser = nullptr;
 	m_client = nullptr;
 }

@@ -64,9 +64,6 @@ private:
 	afx_msg void OnDestroy();
 	afx_msg void OnChangeColor();
 
-
-	signals::scoped_connection m_onCreateConnection;
-
 	bool m_colorButtonEnabled = true;
 public:
 	afx_msg void OnUpdateChangeColor(CCmdUI *pCmdUI);

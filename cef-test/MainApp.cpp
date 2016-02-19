@@ -147,8 +147,6 @@ BOOL CMainApp::SetupMainWindow()
 	// To create the main window, this code creates a new frame window
 	// object and then sets it as the application's main window object
 	CMainFrame* pFrame = new CMainFrame;
-	if (!pFrame)
-		return FALSE;
 	m_pMainWnd = pFrame;
 	// create and load the frame with its resources
 	pFrame->LoadFrame(IDR_MAINFRAME,
